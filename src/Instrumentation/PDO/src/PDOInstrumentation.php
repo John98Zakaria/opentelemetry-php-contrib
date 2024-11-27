@@ -116,7 +116,7 @@ class PDOInstrumentation
                 $builder = self::makeBuilder($instrumentation, 'PDO::prepare', $function, $class, $filename, $lineno)
                     ->setSpanKind(SpanKind::KIND_CLIENT);
                 if ($class === PDO::class) {
-                    $builder->setAttribute(TraceAttributes::DB_STATEMENT, mb_convert_encoding($params[0] ?? 'undefined', 'UTF-8'));
+                    $builder->setAttribute('pickware.db.prepare.statement', mb_convert_encoding($params[0] ?? 'undefined', 'UTF-8'));
                 }
                 $parent = Context::getCurrent();
                 $span = $builder->startSpan();
@@ -203,6 +203,7 @@ class PDOInstrumentation
                 /** @psalm-suppress ArgumentTypeCoercion */
                 $builder = self::makeBuilder($instrumentation, 'PDOStatement::fetchAll', $function, $class, $filename, $lineno)
                     ->setSpanKind(SpanKind::KIND_CLIENT)
+                    ->setAttribute('pickware.db.fetchall.statement', $statement->queryString)
                     ->setAttributes($attributes);
                 if ($spanContext = $pdoTracker->getSpanForPreparedStatement($statement)) {
                     $builder->addLink($spanContext);
@@ -224,6 +225,7 @@ class PDOInstrumentation
                 /** @psalm-suppress ArgumentTypeCoercion */
                 $builder = self::makeBuilder($instrumentation, 'PDOStatement::execute', $function, $class, $filename, $lineno)
                     ->setSpanKind(SpanKind::KIND_CLIENT)
+                    ->setAttribute(TraceAttributes::DB_STATEMENT, $statement->queryString)
                     ->setAttributes($attributes);
                 if ($spanContext = $pdoTracker->getSpanForPreparedStatement($statement)) {
                     $builder->addLink($spanContext);
