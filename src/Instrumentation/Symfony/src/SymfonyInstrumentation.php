@@ -66,6 +66,7 @@ final class SymfonyInstrumentation
                         ->setAttribute(TraceAttributes::USER_AGENT_ORIGINAL, $request->headers->get('User-Agent'))
                         ->setAttribute(TraceAttributes::SERVER_ADDRESS, $request->getHost())
                         ->setAttribute(TraceAttributes::SERVER_PORT, $request->getPort())
+                        ->setAttribute('pickware.requestId', $request->headers->get('X-Request-Id'))
                         ->startSpan();
                     $request->attributes->set(SpanInterface::class, $span);
                 } else {
